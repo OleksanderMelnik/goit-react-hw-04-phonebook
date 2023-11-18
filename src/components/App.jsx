@@ -23,35 +23,39 @@ export const App = () => {
   useEffect(() => {
     window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
   }, [contacts]);
+  
+  const addContact = contact => {
+    const isFilterContact = contacts.some(
+      ({ name }) => name.toLowerCase().trim() === contact.name.toLowerCase().trim()
+    );
+        if (isFilterContact) {
+      alert(`${contact.name} is already in contacts`);
+      return;
+    }
 
-  const addContact = ({ name, number }) => {
-    const newContact = {
-      id: nanoid(),
-      name,
-      number,
-    };
-    contacts.filter(contact =>
-      contact.name.toLowerCase().trim() === newContact.name.toLowerCase().trim() ||
-      contact.number.trim() === newContact.number.trim()
-    ).length
-      ? alert(`${newContact.name}: is already in contacts`)
-      : setContacts([newContact, ...contacts]);
-  };
-
-  const deleteContact = id => {
-    setContacts(contacts.filter(contact => contact.id !== id));
+    setContacts(prevContacts => [
+      ...prevContacts,
+      { id: nanoid(), ...contact },
+    ]);
   };
 
   const filterContacts = event => {
-    setFilter(event.currentTarget.value.toLowerCase());
+    setFilter(event.target.value.trim());
   };
 
   const visibleContacts = () => {
+    const lowerContact = filter.toLowerCase();
     return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
+      contact.name.toLowerCase().includes(lowerContact)
     );
   };
 
+  const deleteContact = contactId => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== contactId)
+    );
+  };
+  
   return (
     <Div>
       <Title>Phonebook</Title>
